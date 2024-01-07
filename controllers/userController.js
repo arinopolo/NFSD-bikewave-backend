@@ -1,7 +1,7 @@
 const User = require("../models/userModel");
 
 const userController = {
-  //obtener la informacion de todas los usuarios
+  //obtener la informacion de todos los usuarios
   getUsers: async (req, res, next) => {
     try {
       const userList = await User.find();
@@ -39,7 +39,7 @@ const userController = {
 
       await userToAdd.save();
 
-      res.send(`text: Te has registrado con exito! Tu id es: ${userToAdd}`);
+      res.send(`text: Usuario registrado con exito! El id es: ${userToAdd}`);
     } catch (error) {
       next(error);
     }
@@ -52,7 +52,7 @@ const userController = {
       if (indexToBeDeleted) {
         await User.deleteOne({ _id: indexToBeDeleted });
         res.send(
-          `text: Has eliminado tu cuenta con éxito! Tu id era: ${userToBeDeleted}`
+          `text: Usuario eliminado con éxito! El id del usuario es: ${userToBeDeleted}`
         );
       } else {
         res
@@ -78,54 +78,20 @@ const userController = {
       );
 
       if (userToBeChanged) {
-        res.send(`text: Has cambiado con éxito tu tarea : ${userToBeChanged}`);
+        res.send(
+          `text: Usuario modificado con éxito ! El id del usuario es: ${userToBeChanged}`
+        );
       } else {
-        res
-          .status(404)
-          .send(`text: No se ha encontrado la tarea con id: ${idToBeChanged}`);
-      }
-    } catch (error) {
-      next(error);
-    }
-  },
-  /*
-  //obtener la informacion de una sola tarea por su id
-  
-
-  // eliminar una tarea
- 
-  // modificar una tarea
-  
-  //completar una tarea
-  completeTask: async (req, res, next) => {
-    try {
-      const taskToBeCompleted = req.params.id;
-      const foundTask = await Task.findById(taskToBeCompleted);
-
-      if (!foundTask) {
         res
           .status(404)
           .send(
-            `text: No se ha encontrado la tarea con id: ${taskToBeCompleted}`
+            `text: No se ha encontrado el usuario con id: ${idToBeChanged}`
           );
-      } else {
-        if (foundTask.completed) {
-          foundTask.completed = false;
-          await foundTask.save();
-          res.send(
-            `text: No has completado la tarea: ${foundTask.description}`
-          );
-        } else {
-          foundTask.completed = true;
-          await foundTask.save();
-          res.send(`text: Has completado la tarea: ${foundTask.description}`);
-        }
       }
     } catch (error) {
       next(error);
     }
   },
-  */
 };
 
 module.exports = userController;
