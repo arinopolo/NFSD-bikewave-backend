@@ -1,8 +1,9 @@
 const mongoose = require("mongoose");
+const Schema = mongoose.Schema;
 
-const transactionSchema = new mongoose.Schema({
-  seller: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-  buyer: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+const transactionSchema = new Schema({
+  seller: { type: Schema.Types.ObjectId, ref: "User" },
+  buyer: { type: Schema.Types.ObjectId, ref: "User" },
   price: { type: Number, required: true },
   date: { type: Date, required: true },
   paymentMethod: { type: String, required: true },

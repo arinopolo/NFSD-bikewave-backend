@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
+const Schema = mongoose.Schema;
 
-const bicycleSchema = new mongoose.Schema(
+const bicycleSchema = new Schema(
   {
     brand: { type: String, required: true },
     model: { type: String },
@@ -10,8 +11,8 @@ const bicycleSchema = new mongoose.Schema(
     riderHeight: { type: Number },
     wheelDiameter: { type: Number },
     deposit: { type: Number },
-    rating: { type: mongoose.Schema.Types.ObjectId, ref: "Review" },
-    owner: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    rating: { type: Schema.Types.ObjectId, ref: "Review" },
+    owner: { type: Schema.Types.ObjectId, ref: "User" },
   },
   {
     timestamps: true,

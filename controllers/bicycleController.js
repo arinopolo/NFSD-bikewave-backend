@@ -24,9 +24,7 @@ const bicycleController = {
       } else {
         res
           .status(404)
-          .send(
-            `No se ha encontrado el producto con el id: ${bicycleToBeConsulted}`
-          );
+          .send(`Bicycle with id ${bicycleToBeConsulted} is not found.`);
       }
     } catch (error) {
       next(error);
@@ -35,16 +33,11 @@ const bicycleController = {
   // agregar una bicicleta
   addBicycle: async (req, res, next) => {
     try {
-      const data = req.body;
-      const bicycleToAdd = new Bicycle({
-        ...data,
-      });
+      const bicycleToAdd = new Bicycle(req.body);
 
       await bicycleToAdd.save();
 
-      res.send(
-        `text:  Producto agregado con exito! El producto es: ${bicycleToAdd}`
-      );
+      res.send(`Bicycle added. The id is: ${bicycleToAdd._id}`);
     } catch (error) {
       next(error);
     }
@@ -57,15 +50,11 @@ const bicycleController = {
 
       if (indexToBeDeleted) {
         await Bicycle.deleteOne({ _id: indexToBeDeleted });
-        res.send(
-          `text: Producto eliminado con éxito! El id del producto es: ${bicycleToBeDeleted}`
-        );
+        res.send(`Bicycle deleted. The id is: ${bicycleToBeDeleted}`);
       } else {
         res
           .status(404)
-          .send(
-            `text: No se ha encontrado el producto con id: ${bicycleToBeDeleted}`
-          );
+          .send(`Bicycle with id ${bicycleToBeDeleted} is not found.`);
       }
     } catch (error) {
       next(error);
@@ -85,15 +74,11 @@ const bicycleController = {
       );
 
       if (bicycleToBeChanged) {
-        res.send(
-          `text: Has cambiado con éxito tu producto con id: ${bicycleToBeChanged}`
-        );
+        res.send(`Bicycle changed. The id is: ${bicycleToBeChanged}`);
       } else {
         res
           .status(404)
-          .send(
-            `text: No se ha encontrado el producto con id: ${bicycleToBeChanged}`
-          );
+          .send(`Bicycle with id ${bicycleToBeChanged} is not found.`);
       }
     } catch (error) {
       next(error);

@@ -23,7 +23,7 @@ const reviewController = {
       } else {
         res
           .status(404)
-          .send(`Bicycle with id ${reviewToBeConsulted} is not found.`);
+          .send(`Review with id ${reviewToBeConsulted} is not found.`);
       }
     } catch (error) {
       next(error);
@@ -32,16 +32,11 @@ const reviewController = {
   // agregar una reseña
   addReview: async (req, res, next) => {
     try {
-      const data = req.body;
-      const reviewToAdd = new Review({
-        ...data,
-      });
+      const reviewToAdd = new Review(req.body);
 
       await reviewToAdd.save();
 
-      res.send(
-        `text:  Review agregado con exito! El review es: ${reviewToAdd}`
-      );
+      res.send(` Review added. The id is:${reviewToAdd._id}`);
     } catch (error) {
       next(error);
     }
@@ -54,15 +49,11 @@ const reviewController = {
 
       if (indexToBeDeleted) {
         await Review.deleteOne({ _id: indexToBeDeleted });
-        res.send(
-          `text: Review eliminado con éxito! El id del review es: ${reviewToBeDeleted}`
-        );
+        res.send(`Review deleted. The id is: ${reviewToBeDeleted}`);
       } else {
         res
           .status(404)
-          .send(
-            `text: No se ha encontrado el review con id: ${reviewToBeDeleted}`
-          );
+          .send(`Review with id ${reviewToBeDeleted} is not found.`);
       }
     } catch (error) {
       next(error);
@@ -81,15 +72,11 @@ const reviewController = {
       );
 
       if (reviewToBeChanged) {
-        res.send(
-          `text: Has cambiado con éxito tu review con id: ${reviewToBeChanged}`
-        );
+        res.send(`Review changed. The id is: ${reviewToBeChanged}`);
       } else {
         res
           .status(404)
-          .send(
-            `text: No se ha encontrado el review con id: ${reviewToBeChanged}`
-          );
+          .send(`Review with id ${reviewToBeChanged} is not found.`);
       }
     } catch (error) {
       next(error);

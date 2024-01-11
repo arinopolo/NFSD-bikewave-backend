@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
+const Schema = mongoose.Schema;
 
-const userSchema = new mongoose.Schema(
+const userSchema = new Schema(
   {
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
@@ -11,10 +12,10 @@ const userSchema = new mongoose.Schema(
     location: { type: String, required: true },
     phoneNumber: { type: String, required: true },
     profilePicture: { type: String },
-    bicycles: { type: mongoose.Schema.Types.ObjectId, ref: "Bicycle" },
+    bicycles: { type: Schema.Types.ObjectId, ref: "Bicycle" },
     rentals: [
       {
-        bicycleId: { type: mongoose.Schema.Types.ObjectId, ref: "Bicycle" },
+        bicycleId: { type: Schema.Types.ObjectId, ref: "Bicycle" },
         startDate: { type: Date },
         endDate: { type: Date },
       },

@@ -39,7 +39,7 @@ const transactionController = {
 
       await transactionToAdd.save();
 
-      res.send(`Transaction added. The id is: ${transactionToAdd}`);
+      res.send(`Transaction added. The id is: ${transactionToAdd._id}`);
     } catch (error) {
       next(error);
     }
