@@ -25,7 +25,7 @@ const transactionController = {
         res
           .status(404)
           .send(
-            `No se ha encontrado la transaccion con el id: ${transactionToBeConsulted}`
+            `Transaction with id ${transactionToBeConsulted} is not found.`
           );
       }
     } catch (error) {
@@ -35,16 +35,11 @@ const transactionController = {
   //añadir una transaccion
   addTransaction: async (req, res, next) => {
     try {
-      const data = req.body;
-      const transactionToAdd = new Transaction({
-        ...data,
-      });
+      const transactionToAdd = new Transaction(req.body);
 
       await transactionToAdd.save();
 
-      res.send(
-        `text: La transacción guardada con exito! La transacción es: ${transactionToAdd}`
-      );
+      res.send(`Transaction added. The id is: ${transactionToAdd}`);
     } catch (error) {
       next(error);
     }
@@ -59,15 +54,11 @@ const transactionController = {
 
       if (indexToBeDeleted) {
         await Transaction.deleteOne({ _id: indexToBeDeleted });
-        res.send(
-          `text: La transacción eliminada con exito! El id de la transacción es:  ${transactionToBeDeleted}`
-        );
+        res.send(`Transaction deleted. The id is:  ${transactionToBeDeleted}`);
       } else {
         res
           .status(404)
-          .send(
-            `text: No se ha encontrado la transacción con id: ${transactionToBeDeleted}`
-          );
+          .send(`Transaction with id ${transactionToBeDeleted} is not found.`);
       }
     } catch (error) {
       next(error);
@@ -87,15 +78,11 @@ const transactionController = {
       );
 
       if (transactionToBeChanged) {
-        res.send(
-          `text: Se ha cambiado con éxito la transacción con id: ${transactionToBeChanged}`
-        );
+        res.send(`Transaction changed. The id is: ${transactionToBeChanged}`);
       } else {
         res
           .status(404)
-          .send(
-            `text: No se ha encontrado la transacción con id: ${transactionToBeChanged}`
-          );
+          .send(`Transaction with id ${transactionToBeChanged} is not found.`);
       }
     } catch (error) {
       next(error);

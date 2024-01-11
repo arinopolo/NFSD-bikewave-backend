@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const TransactionSchema = new mongoose.Schema({
+const transactionSchema = new mongoose.Schema({
   seller: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   buyer: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   price: { type: Number, required: true },
@@ -11,6 +11,6 @@ const TransactionSchema = new mongoose.Schema({
   //un puente de pago para hacerlo con seguridad
 });
 
-const Transaction = mongoose.model("transaction", TransactionSchema);
+const Transaction = mongoose.model("Transaction", transactionSchema);
 
 module.exports = Transaction;

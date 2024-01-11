@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const BicycleSchema = new mongoose.Schema(
+const bicycleSchema = new mongoose.Schema(
   {
     brand: { type: String, required: true },
     model: { type: String },
@@ -10,7 +10,7 @@ const BicycleSchema = new mongoose.Schema(
     riderHeight: { type: Number },
     wheelDiameter: { type: Number },
     deposit: { type: Number },
-    rating: { type: mongoose.Schema.Types.ObjectId, ref: "Rating" },
+    rating: { type: mongoose.Schema.Types.ObjectId, ref: "Review" },
     owner: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   },
   {
@@ -18,6 +18,6 @@ const BicycleSchema = new mongoose.Schema(
   }
 );
 
-const Bicycle = mongoose.model("bicycle", BicycleSchema);
+const Bicycle = mongoose.model("Bicycle", bicycleSchema);
 
 module.exports = Bicycle;

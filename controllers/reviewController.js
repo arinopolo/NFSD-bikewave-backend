@@ -1,7 +1,7 @@
 const Review = require("../models/reviewModel");
 
 const reviewController = {
-  //obtener la informacion de todas las bicicletas
+  //obtener la informacion de todas las reseñas
   getReviews: async (req, res, next) => {
     try {
       const reviewList = await Review.find();
@@ -10,7 +10,7 @@ const reviewController = {
       next(error);
     }
   },
-  //obtener la informacion de una bicicleta
+  //obtener la informacion de una reseña
   getOneReview: async (req, res, next) => {
     try {
       const reviewToBeConsulted = req.params.id;
@@ -18,21 +18,18 @@ const reviewController = {
         reviewToBeConsulted
       );
 
-      // cuando pongo un id aleatorio para que me ejecute el else no me lo ejecuto, me de el error de BSON...
       if (indexOfReviewToBeConsulted) {
         res.json(await Review.find(indexOfReviewToBeConsulted));
       } else {
         res
           .status(404)
-          .send(
-            `No se ha encontrado el producto con el id: ${reviewToBeConsulted}`
-          );
+          .send(`Bicycle with id ${reviewToBeConsulted} is not found.`);
       }
     } catch (error) {
       next(error);
     }
   },
-  // agregar una bicicleta
+  // agregar una reseña
   addReview: async (req, res, next) => {
     try {
       const data = req.body;
@@ -49,7 +46,7 @@ const reviewController = {
       next(error);
     }
   },
-  //eliminar una bicicleta
+  //eliminar una reseña
   deleteReview: async (req, res, next) => {
     try {
       const reviewToBeDeleted = req.params.id;
@@ -71,7 +68,7 @@ const reviewController = {
       next(error);
     }
   },
-  // cambiar informacion de una bicicleta
+  // cambiar informacion de una reseña
   changeReview: async (req, res, next) => {
     try {
       const idToBeChanged = req.params.id;

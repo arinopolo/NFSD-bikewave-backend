@@ -3,6 +3,7 @@ const app = express();
 const port = 3000;
 const cors = require("cors");
 const mongoose = require("mongoose");
+const errorHandler = require("./errorHandler");
 
 app.use(express.json());
 
@@ -21,6 +22,8 @@ app.use("/users", userRouter);
 app.use("/bicycles", bicycleRouter);
 app.use("/transactions", transactionRouter);
 app.use("/reviews", reviewRouter);
+
+app.use(errorHandler);
 
 app.listen(port, () => {
   console.log("Servidor funcionando");

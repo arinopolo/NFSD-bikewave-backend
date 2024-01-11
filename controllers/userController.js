@@ -19,11 +19,7 @@ const userController = {
       if (indexOfUserToBeConsulted) {
         res.json(await User.find(indexOfUserToBeConsulted));
       } else {
-        res
-          .status(404)
-          .send(
-            `No se ha encontrado el usuario con el id: ${userToBeConsulted}`
-          );
+        res.status(404).send(`User with id ${userToBeConsulted} is not found.`);
       }
     } catch (error) {
       next(error);
@@ -32,14 +28,10 @@ const userController = {
 
   addUser: async (req, res, next) => {
     try {
-      const data = req.body;
-      const userToAdd = new User({
-        ...data,
-      });
-
+      const userToAdd = new User(req.body);
       await userToAdd.save();
 
-      res.send(`text: Usuario registrado con exito! El id es: ${userToAdd}`);
+      res.send(`User registered. The id is: ${userToAdd._id}`);
     } catch (error) {
       next(error);
     }
@@ -51,15 +43,9 @@ const userController = {
 
       if (indexToBeDeleted) {
         await User.deleteOne({ _id: indexToBeDeleted });
-        res.send(
-          `text: Usuario eliminado con éxito! El id del usuario es: ${userToBeDeleted}`
-        );
+        res.send(`User deleted. The id is:  ${userToBeDeleted}`);
       } else {
-        res
-          .status(404)
-          .send(
-            `text: No se ha encontrado el usuario con id: ${userToBeDeleted}`
-          );
+        res.status(404).send(`User with id ${userToBeDeleted} is not found.`);
       }
     } catch (error) {
       next(error);
@@ -78,15 +64,9 @@ const userController = {
       );
 
       if (userToBeChanged) {
-        res.send(
-          `text: Usuario modificado con éxito ! El id del usuario es: ${userToBeChanged}`
-        );
+        res.send(`User changed. The id is: ${userToBeChanged}`);
       } else {
-        res
-          .status(404)
-          .send(
-            `text: No se ha encontrado el usuario con id: ${idToBeChanged}`
-          );
+        res.status(404).send(`User with id ${idToBeChanged} is not found.`);
       }
     } catch (error) {
       next(error);
