@@ -23,7 +23,7 @@ const reviewController = {
       } else {
         res
           .status(404)
-          .send(`Review with id ${reviewToBeConsulted} is not found.`);
+          .json({ msg: `Review with id ${reviewToBeConsulted} is not found.` });
       }
     } catch (error) {
       next(error);
@@ -36,7 +36,9 @@ const reviewController = {
 
       await reviewToAdd.save();
 
-      res.send(` Review added. The id is:${reviewToAdd._id}`);
+      res
+        .status(200)
+        .json({ msg: ` Review added. The id is:${reviewToAdd._id}` });
     } catch (error) {
       next(error);
     }
@@ -49,11 +51,13 @@ const reviewController = {
 
       if (indexToBeDeleted) {
         await Review.deleteOne({ _id: indexToBeDeleted });
-        res.send(`Review deleted. The id is: ${reviewToBeDeleted}`);
+        res
+          .status(200)
+          .json({ msg: `Review deleted. The id is: ${reviewToBeDeleted}` });
       } else {
         res
           .status(404)
-          .send(`Review with id ${reviewToBeDeleted} is not found.`);
+          .json({ msg: `Review with id ${reviewToBeDeleted} is not found.` });
       }
     } catch (error) {
       next(error);
@@ -72,11 +76,13 @@ const reviewController = {
       );
 
       if (reviewToBeChanged) {
-        res.send(`Review changed. The id is: ${reviewToBeChanged}`);
+        res
+          .status(200)
+          .json({ msg: `Review changed. The id is: ${reviewToBeChanged}` });
       } else {
         res
           .status(404)
-          .send(`Review with id ${reviewToBeChanged} is not found.`);
+          .json({ msg: `Review with id ${reviewToBeChanged} is not found.` });
       }
     } catch (error) {
       next(error);

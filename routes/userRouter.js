@@ -7,6 +7,8 @@ const router = express.Router();
 router.get("/", userController.getUsers);
 router.get("/:id", userController.getOneUser);
 router.post("/", userController.addUser);
+router.post("/login", userController.checkUser);
+router.post("/refreshtoken", userController.refreshToken);
 router.delete("/:id", userController.deleteUser);
 router.patch("/:id", userController.changeUser);
 

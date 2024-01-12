@@ -22,11 +22,9 @@ const transactionController = {
       if (indexOfTransactionToBeConsulted) {
         res.json(await Transaction.find(indexOfTransactionToBeConsulted));
       } else {
-        res
-          .status(404)
-          .send(
-            `Transaction with id ${transactionToBeConsulted} is not found.`
-          );
+        res.status(404).json({
+          msg: `Transaction with id ${transactionToBeConsulted} is not found.`,
+        });
       }
     } catch (error) {
       next(error);
@@ -39,7 +37,9 @@ const transactionController = {
 
       await transactionToAdd.save();
 
-      res.send(`Transaction added. The id is: ${transactionToAdd._id}`);
+      res
+        .status(200)
+        .json({ msg: `Transaction added. The id is: ${transactionToAdd._id}` });
     } catch (error) {
       next(error);
     }
@@ -54,11 +54,13 @@ const transactionController = {
 
       if (indexToBeDeleted) {
         await Transaction.deleteOne({ _id: indexToBeDeleted });
-        res.send(`Transaction deleted. The id is:  ${transactionToBeDeleted}`);
+        res.status(200).json({
+          msg: `Transaction deleted. The id is:  ${transactionToBeDeleted}`,
+        });
       } else {
-        res
-          .status(404)
-          .send(`Transaction with id ${transactionToBeDeleted} is not found.`);
+        res.status(404).json({
+          msg: `Transaction with id ${transactionToBeDeleted} is not found.`,
+        });
       }
     } catch (error) {
       next(error);
@@ -78,11 +80,17 @@ const transactionController = {
       );
 
       if (transactionToBeChanged) {
-        res.send(`Transaction changed. The id is: ${transactionToBeChanged}`);
+        res
+          .status(200)
+          .json({
+            msg: `Transaction changed. The id is: ${transactionToBeChanged}`,
+          });
       } else {
         res
           .status(404)
-          .send(`Transaction with id ${transactionToBeChanged} is not found.`);
+          .json({
+            msg: `Transaction with id ${transactionToBeChanged} is not found.`,
+          });
       }
     } catch (error) {
       next(error);

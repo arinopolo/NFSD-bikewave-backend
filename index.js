@@ -32,5 +32,5 @@ app.use("/messages", messageRouter);
 app.use(errorHandler);
 
 app.listen(port, () => {
-  console.log("Servidor funcionando");
+  console.log("Servidor funcionando.");
 });

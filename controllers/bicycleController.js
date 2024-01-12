@@ -22,9 +22,9 @@ const bicycleController = {
       if (indexOfBicycleToBeConsulted) {
         res.json(await Bicycle.find(indexOfBicycleToBeConsulted));
       } else {
-        res
-          .status(404)
-          .send(`Bicycle with id ${bicycleToBeConsulted} is not found.`);
+        res.status(404).json({
+          msg: `Bicycle with id ${bicycleToBeConsulted} is not found.`,
+        });
       }
     } catch (error) {
       next(error);
@@ -37,7 +37,9 @@ const bicycleController = {
 
       await bicycleToAdd.save();
 
-      res.send(`Bicycle added. The id is: ${bicycleToAdd._id}`);
+      res
+        .status(200)
+        .json({ msg: `Bicycle added. The id is: ${bicycleToAdd._id}` });
     } catch (error) {
       next(error);
     }
@@ -50,11 +52,13 @@ const bicycleController = {
 
       if (indexToBeDeleted) {
         await Bicycle.deleteOne({ _id: indexToBeDeleted });
-        res.send(`Bicycle deleted. The id is: ${bicycleToBeDeleted}`);
+        res
+          .status(200)
+          .json({ msg: `Bicycle deleted. The id is: ${bicycleToBeDeleted}` });
       } else {
         res
           .status(404)
-          .send(`Bicycle with id ${bicycleToBeDeleted} is not found.`);
+          .json({ msg: `Bicycle with id ${bicycleToBeDeleted} is not found.` });
       }
     } catch (error) {
       next(error);
@@ -74,11 +78,13 @@ const bicycleController = {
       );
 
       if (bicycleToBeChanged) {
-        res.send(`Bicycle changed. The id is: ${bicycleToBeChanged}`);
+        res
+          .status(200)
+          .json({ msg: `Bicycle changed. The id is: ${bicycleToBeChanged}` });
       } else {
         res
           .status(404)
-          .send(`Bicycle with id ${bicycleToBeChanged} is not found.`);
+          .json({ msg: `Bicycle with id ${bicycleToBeChanged} is not found.` });
       }
     } catch (error) {
       next(error);
