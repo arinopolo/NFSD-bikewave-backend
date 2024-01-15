@@ -1,18 +1,12 @@
 const User = require("../models/userModel");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const mySecret = "cooper";
+
+const mySecret = process.env.SECRET;
 
 const userController = {
   //obtener la informacion de todos los usuarios
-  getUsers: async (req, res, next) => {
-    try {
-      const userList = await User.find();
-      res.json(userList);
-    } catch (error) {
-      next(error);
-    }
-  },
+
   getOneUser: async (req, res, next) => {
     try {
       const userToBeConsulted = req.params.id;
@@ -44,7 +38,7 @@ const userController = {
         salt: userSalt,
       });
       await userToAdd.save();
-      console.log(userToAdd);
+
       res
         .status(200)
         .json({ msg: `User registered. The id is: ${userToAdd._id}` });
@@ -88,31 +82,12 @@ const userController = {
       }
       if (jwt.verify(token, mySecret)) {
         return next();
-      } 
-    } catch (error) {
-      next(error);
-    }
-  },
-
-  refreshToken: async (req, res, next) => {
-    try {
-      const { email } = req.body;
-      const foundUser = await User.findOne({ email });
-
-      if (!foundUser || !foundUser.isActive) {
-        return res.status(404).json({ msg: "User not authorized." });
       }
-
-      // genera un nuevo token si el usuario esta activo
-      const token = jwt.sign({ email: foundUser.email }, mySecret, {
-        expiresIn: "1d",
-      });
-
-      res.status(200).json({ msg: "Token refreshed.", token });
     } catch (error) {
       next(error);
     }
   },
+
   deleteUser: async (req, res, next) => {
     try {
       const userToBeDeleted = req.params.id;

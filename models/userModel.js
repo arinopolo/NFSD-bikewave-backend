@@ -6,7 +6,6 @@ const userSchema = new Schema(
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     salt: { type: Number, required: true },
-    isActive: { type: Boolean, default: false },
     firstName: { type: String, required: true },
     secondName: { type: String, required: true },
     //pedir DNI???
