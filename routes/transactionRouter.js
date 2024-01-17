@@ -12,7 +12,6 @@ router.get(
 );
 router.get("/:id", transactionController.getOneTransaction);
 router.post("/", transactionController.addTransaction);
-//router.delete("/:id", transactionController.deleteTransaction);
-//router.patch("/:id", transactionController.changeTransaction);
+
 
 module.exports = router;

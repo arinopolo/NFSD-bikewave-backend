@@ -10,6 +10,7 @@ const userController = {
   getOneUser: async (req, res, next) => {
     try {
       const userToBeConsulted = req.params.id;
+
       const indexOfUserToBeConsulted = await User.findById(userToBeConsulted);
 
       // cuando pongo un id aleatorio para que me ejecute el else no me lo ejecuto, me de el error de BSON...

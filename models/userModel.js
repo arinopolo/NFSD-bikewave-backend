@@ -8,11 +8,13 @@ const userSchema = new Schema(
     salt: { type: Number, required: true },
     firstName: { type: String, required: true },
     secondName: { type: String, required: true },
-    //pedir DNI???
-    description: { type: String },
     location: { type: String, required: true },
-    phoneNumber: { type: String, required: true },
+    //pedir DNI?
+    description: { type: String },
+    phoneNumber: { type: String },
     profilePicture: { type: String },
+
+    //de bicicletas poner como un array?
     bicycles: { type: Schema.Types.ObjectId, ref: "Bicycle" },
     rentals: [
       {
