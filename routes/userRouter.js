@@ -4,10 +4,9 @@ const router = express.Router();
 
 //Routes
 
-
 router.get("/:id", userController.getOneUser);
 router.post("/", userController.addUser);
-router.post("/login", userController.checkUser);
+router.post("/login", userController.loginUser);
 router.delete("/:id", userController.deleteUser);
 router.patch("/:id", userController.changeUser);
 

@@ -33,7 +33,15 @@ const bicycleController = {
   // agregar una bicicleta
   addBicycle: async (req, res, next) => {
     try {
-      const bicycleToAdd = new Bicycle(req.body);
+      //bucar el id deusuario del token al email y buscarlo por email y hacer req.body.owner= aqui pongo el id
+      console.log(req);
+      console.log(req.userId, req.email);
+
+      const data = {
+        ...req.body,
+        owner: req.userId,
+      };
+      const bicycleToAdd = new Bicycle(data);
 
       await bicycleToAdd.save();
 

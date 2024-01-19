@@ -4,7 +4,7 @@ const transactionController = {
   //obtener la informacion de todas las transacciones
   getTransactions: async (req, res, next) => {
     try {
-      const transactionList = await Transaction.find();
+      const transactionList = await Transaction.find({ email: req.userId });
       res.json(transactionList);
     } catch (error) {
       next(error);

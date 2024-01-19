@@ -4,6 +4,7 @@ const Schema = mongoose.Schema;
 const transactionSchema = new Schema({
   seller: { type: Schema.Types.ObjectId, ref: "User" },
   buyer: { type: Schema.Types.ObjectId, ref: "User" },
+  product: { type: Schema.Types.ObjectId, ref: "Bicycle" },
   price: { type: Number, required: true },
   date: { type: Date, required: true },
   paymentMethod: { type: String, required: true },

@@ -8,14 +8,15 @@ const userSchema = new Schema(
     salt: { type: Number, required: true },
     firstName: { type: String, required: true },
     secondName: { type: String, required: true },
-    location: { type: String, required: true },
+    location: { type: String },
     //pedir DNI?
     description: { type: String },
     phoneNumber: { type: String },
     profilePicture: { type: String },
 
     //de bicicletas poner como un array?
-    bicycles: { type: Schema.Types.ObjectId, ref: "Bicycle" },
+    bicycles: [{ type: Schema.Types.ObjectId, ref: "Bicycle" }],
+
     rentals: [
       {
         bicycleId: { type: Schema.Types.ObjectId, ref: "Bicycle" },

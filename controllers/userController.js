@@ -48,42 +48,47 @@ const userController = {
     }
   },
 
-  checkUser: async (req, res, next) => {
+  loginUser: async (req, res, next) => {
     const { email, password } = req.body;
 
-    // comprobando si el email esta registrado
+    // chequeando si el email esta registrado
     const [foundUser] = await User.find({ email });
     if (!foundUser) {
-      return res
-        .status(404)
-        .json({ msg: `User with email ${req.body.email} is not found.` });
+      return res.status(301).json({ msg: `Incorrect login.` });
     }
 
     // comprobando si la contraseña es correcta
     if (await bcrypt.compare(password, foundUser.password)) {
-      // el usuario ha entrado en la app y esta activo
-      foundUser.isActive = true;
-      await foundUser.save();
-      console.log(foundUser);
       //genero un token o jwt
-      const token = jwt.sign({ email: foundUser.email }, mySecret, {
-        expiresIn: "1d",
-      });
+      const token = jwt.sign(
+        { email: foundUser.email, id: foundUser._id },
+        mySecret,
+
+        {
+          expiresIn: "30d",
+        }
+      );
       return res.status(200).json({ msg: `User logged in.`, token });
     }
 
-    res.status(404).json({ msg: `Incorrert password.` });
+    res.status(403).json({ msg: `Incorrert password.` });
   },
 
   verifyToken: async (req, res, next) => {
     try {
       const token = req.headers.authorization;
       if (!token) {
-        res.status(404).json({ msg: `Missing token.` });
+        res.status(403).json({ msg: `Missing token.` });
       }
-      if (jwt.verify(token, mySecret)) {
+      jwt.verify(token, mySecret, (error, decoded) => {
+        if (error) {
+          return res.status(403).json({ msg: ` Invalid token.` });
+        }
+
+        req.userId = decoded.id;
+
         return next();
-      }
+      });
     } catch (error) {
       next(error);
     }
