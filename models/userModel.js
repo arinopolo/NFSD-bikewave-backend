@@ -16,7 +16,7 @@ const userSchema = new Schema(
 
     //de bicicletas poner como un array?
     bicycles: [{ type: Schema.Types.ObjectId, ref: "Bicycle" }],
-
+    favorites: [{ type: Schema.Types.ObjectId, ref: "Bicycle" }],
     rentals: [
       {
         bicycleId: { type: Schema.Types.ObjectId, ref: "Bicycle" },

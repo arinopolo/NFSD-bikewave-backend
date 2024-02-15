@@ -8,6 +8,7 @@ const bicycleSchema = new Schema(
     location: { type: String, required: true },
     category: { type: String },
     model: { type: String },
+    photo: { type: String },
     description: { type: String },
     riderHeight: { type: Number },
     wheelDiameter: { type: Number },

@@ -1,10 +1,35 @@
 const Bicycle = require("../models/bicycleModel");
+const User = require("../models/userModel");
+const { v2: cloudinary } = require("cloudinary");
+
+cloudinary.config({
+  cloud_name: "du6tcqzpu",
+  api_key: "438824242274272",
+  api_secret: "aMIB0AIfwoBe1dcP23w_eZxkI5Y",
+});
 
 const bicycleController = {
   //obtener la informacion de todas las bicicletas
   getBicycles: async (req, res, next) => {
     try {
-      const bicycleList = await Bicycle.find();
+      let filter = {};
+
+      if (req.query.category) {
+        filter.category = req.query.category;
+      }
+
+      if (req.query.minPrice && req.query.maxPrice) {
+        filter.price = {
+          $gt: req.query.minPrice,
+          $lt: req.query.maxPrice,
+        };
+      }
+
+      if (req.query.location) {
+        filter.location = req.query.location.toLowerCase();
+      }
+
+      const bicycleList = await Bicycle.find(filter);
       res.json(bicycleList);
     } catch (error) {
       next(error);
@@ -18,9 +43,9 @@ const bicycleController = {
         bicycleToBeConsulted
       );
 
-      // cuando pongo un id aleatorio para que me ejecute el else no me lo ejecuto, me de el error de BSON...
       if (indexOfBicycleToBeConsulted) {
-        res.json(await Bicycle.find(indexOfBicycleToBeConsulted));
+        res.json(await Bicycle.findOne(indexOfBicycleToBeConsulted));
+        console.log(indexOfBicycleToBeConsulted);
       } else {
         res.status(404).json({
           msg: `Bicycle with id ${bicycleToBeConsulted} is not found.`,
@@ -33,9 +58,16 @@ const bicycleController = {
   // agregar una bicicleta
   addBicycle: async (req, res, next) => {
     try {
-      //bucar el id deusuario del token al email y buscarlo por email y hacer req.body.owner= aqui pongo el id
-      console.log(req);
-      console.log(req.userId, req.email);
+      if (req.file) {
+        // subo la imagen a Cloudinary
+        const imageB64 = Buffer.from(req.file.buffer).toString("base64");
+        const dataURI = "data:" + req.file.mimetype + ";base64," + imageB64;
+        const imageRes = await cloudinary.uploader.upload(dataURI, {
+          resource_type: "auto",
+        });
+
+        req.body.photo = imageRes.secure_url;
+      }
 
       const data = {
         ...req.body,
@@ -45,13 +77,39 @@ const bicycleController = {
 
       await bicycleToAdd.save();
 
-      res
-        .status(200)
-        .json({ msg: `Bicycle added. The id is: ${bicycleToAdd._id}` });
+      // se guarda la bicicleta en el modelo de usuario como su rental
+      const user = await User.findById(req.userId);
+      user.rentals.push(bicycleToAdd);
+      await user.save();
+
+      res.status(200).json({
+        msg: `Bicycle added. The id is: ${bicycleToAdd._id}`,
+        success: true,
+      });
     } catch (error) {
       next(error);
     }
   },
+
+  /*addImage: async (req, res, next) => {
+    try {
+      if (!req.file) {
+        return res.status(500).json({ error: "file not found" });
+      }
+      console.log(req.file.buffer);
+      const imageB64 = Buffer.from(req.file.buffer).toString("base64");
+      const dataURI = "data:" + req.file.mimetype + ";base64," + imageB64;
+      const imageRes = await cloudinary.uploader.upload(dataURI, {
+        resource_type: "auto",
+      });
+      console.log(imageRes);
+      res.json({ image: "uploaded " });
+    } catch (error) {
+      next(error);
+    }
+  },
+  */
+
   //eliminar una bicicleta
   deleteBicycle: async (req, res, next) => {
     try {

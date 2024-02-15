@@ -1,4 +1,5 @@
 const User = require("../models/userModel");
+const Bicycle = require("../models/bicycleModel");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
@@ -9,13 +10,10 @@ const userController = {
 
   getOneUser: async (req, res, next) => {
     try {
-      const userToBeConsulted = req.params.id;
-
-      const indexOfUserToBeConsulted = await User.findById(userToBeConsulted);
-
+      const indexOfUserToBeConsulted = await User.findById(req.userId);
       // cuando pongo un id aleatorio para que me ejecute el else no me lo ejecuto, me de el error de BSON...
       if (indexOfUserToBeConsulted) {
-        res.status(200).json(await User.find(indexOfUserToBeConsulted));
+        res.status(200).json(indexOfUserToBeConsulted);
       } else {
         res
           .status(404)
@@ -40,9 +38,10 @@ const userController = {
       });
       await userToAdd.save();
 
-      res
-        .status(200)
-        .json({ msg: `User registered. The id is: ${userToAdd._id}` });
+      res.status(200).json({
+        msg: `User registered. The id is: ${userToAdd._id}`,
+        success: true,
+      });
     } catch (error) {
       next(error);
     }
@@ -68,21 +67,25 @@ const userController = {
           expiresIn: "30d",
         }
       );
-      return res.status(200).json({ msg: `User logged in.`, token });
+      return res
+        .status(200)
+        .json({ msg: `User logged in.`, token, success: true });
     }
 
-    res.status(403).json({ msg: `Incorrert password.` });
+    res.status(403).json({ msg: `Incorrect credentials.`, success: false });
   },
 
   verifyToken: async (req, res, next) => {
     try {
       const token = req.headers.authorization;
       if (!token) {
-        res.status(403).json({ msg: `Missing token.` });
+        res.status(403).json({ msg: `Missing token.`, success: false });
       }
       jwt.verify(token, mySecret, (error, decoded) => {
         if (error) {
-          return res.status(403).json({ msg: ` Invalid token.` });
+          return res
+            .status(403)
+            .json({ msg: ` Invalid token.`, success: false });
         }
 
         req.userId = decoded.id;
@@ -93,6 +96,39 @@ const userController = {
       next(error);
     }
   },
+  getFavorites: async (req, res, next) => {
+    try {
+      const user = await User.findById(req.userId).populate("favorites");
+      res.json(user.favorites);
+    } catch (error) {
+      console.log(error);
+      next(error);
+    }
+  },
+
+   addToFavorites: async (req, res, next) => {
+    try {
+      const bicycleId = req.params.id;
+      const user = await User.findById(req.userId);
+
+      if (user.favorites.includes(bicycleId)) {
+        return res.status(400).json({
+          message: "La bicicleta ya está en la lista de favoritos del usuario",
+        });
+      }
+
+      // Agregar la bicicleta a la lista de favoritos del usuario
+      user.favorites.push(bicycleId);
+      await user.save();
+
+      res.status(200).json({
+        message: "Bicicleta agregada a la lista de favoritos del usuario",
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+  
 
   deleteUser: async (req, res, next) => {
     try {
