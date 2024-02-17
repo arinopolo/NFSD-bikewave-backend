@@ -13,6 +13,12 @@ router.post(
   userController.verifyToken,
   userController.addToFavorites
 );
+
+router.delete(
+  "/favorites/:id",
+  userController.verifyToken,
+  userController.deleteFromFavorites
+);
 router.get("/:id", userController.verifyToken, userController.getOneUser);
 router.post("/", userController.addUser);
 router.post("/login", userController.loginUser);

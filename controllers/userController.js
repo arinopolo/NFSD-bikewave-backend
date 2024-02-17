@@ -69,7 +69,13 @@ const userController = {
       );
       return res
         .status(200)
-        .json({ msg: `User logged in.`, token, success: true });
+        .json({
+          msg: `User logged in.`,
+          token,
+          success: true,
+          userId: foundUser._id,
+          userName: foundUser.firstName,
+        });
     }
 
     res.status(403).json({ msg: `Incorrect credentials.`, success: false });
@@ -106,14 +112,14 @@ const userController = {
     }
   },
 
-   addToFavorites: async (req, res, next) => {
+  addToFavorites: async (req, res, next) => {
     try {
       const bicycleId = req.params.id;
       const user = await User.findById(req.userId);
 
       if (user.favorites.includes(bicycleId)) {
         return res.status(400).json({
-          message: "La bicicleta ya está en la lista de favoritos del usuario",
+          message: "Bicycle is already in the favorites list.",
         });
       }
 
@@ -122,13 +128,37 @@ const userController = {
       await user.save();
 
       res.status(200).json({
-        message: "Bicicleta agregada a la lista de favoritos del usuario",
+        message: "Bicycle added to the favorites list.",
       });
     } catch (error) {
       next(error);
     }
   },
-  
+
+  deleteFromFavorites: async (req, res, next) => {
+    try {
+      const bicycleId = req.params.id;
+      const user = await User.findById(req.userId);
+
+      if (user.favorites.includes(bicycleId)) {
+        const index = user.favorites.findIndex(
+          (item) => item._id === bicycleId
+        );
+        user.favorites.splice(index, 1);
+        await user.save();
+
+        res.status(200).json({
+          message: "Bicycle deleted from the favorites list.",
+        });
+      } else {
+        return res.status(400).json({
+          message: "Bicycle is not in the favorites list.",
+        });
+      }
+    } catch (error) {
+      next(error);
+    }
+  },
 
   deleteUser: async (req, res, next) => {
     try {
