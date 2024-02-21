@@ -4,10 +4,13 @@ const Schema = mongoose.Schema;
 const bicycleSchema = new Schema(
   {
     brand: { type: String, required: true },
-    model: { type: String },
-    description: { type: String },
     price: { type: Number, required: true },
     location: { type: String, required: true },
+    isFav: { type: Boolean, default: false },
+    category: { type: String },
+    model: { type: String },
+    photo: { type: String },
+    description: { type: String },
     riderHeight: { type: Number },
     wheelDiameter: { type: Number },
     deposit: { type: Number },

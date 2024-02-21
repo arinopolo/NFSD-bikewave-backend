@@ -4,7 +4,7 @@ const transactionController = {
   //obtener la informacion de todas las transacciones
   getTransactions: async (req, res, next) => {
     try {
-      const transactionList = await Transaction.find();
+      const transactionList = await Transaction.find({ email: req.userId });
       res.json(transactionList);
     } catch (error) {
       next(error);
@@ -40,58 +40,6 @@ const transactionController = {
       res
         .status(200)
         .json({ msg: `Transaction added. The id is: ${transactionToAdd._id}` });
-    } catch (error) {
-      next(error);
-    }
-  },
-  //eliminar una transaccion
-  deleteTransaction: async (req, res, next) => {
-    try {
-      const transactionToBeDeleted = req.params.id;
-      const indexToBeDeleted = await Transaction.findById(
-        transactionToBeDeleted
-      );
-
-      if (indexToBeDeleted) {
-        await Transaction.deleteOne({ _id: indexToBeDeleted });
-        res.status(200).json({
-          msg: `Transaction deleted. The id is:  ${transactionToBeDeleted}`,
-        });
-      } else {
-        res.status(404).json({
-          msg: `Transaction with id ${transactionToBeDeleted} is not found.`,
-        });
-      }
-    } catch (error) {
-      next(error);
-    }
-  },
-  //cambiar una transaccion
-  changeTransaction: async (req, res, next) => {
-    try {
-      const idToBeChanged = req.params.id;
-
-      const newData = req.body;
-
-      let transactionToBeChanged = await Transaction.findByIdAndUpdate(
-        idToBeChanged,
-        newData,
-        { new: true }
-      );
-
-      if (transactionToBeChanged) {
-        res
-          .status(200)
-          .json({
-            msg: `Transaction changed. The id is: ${transactionToBeChanged}`,
-          });
-      } else {
-        res
-          .status(404)
-          .json({
-            msg: `Transaction with id ${transactionToBeChanged} is not found.`,
-          });
-      }
     } catch (error) {
       next(error);
     }

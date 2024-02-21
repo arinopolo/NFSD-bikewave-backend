@@ -63,31 +63,6 @@ const reviewController = {
       next(error);
     }
   },
-  // cambiar informacion de una reseña
-  changeReview: async (req, res, next) => {
-    try {
-      const idToBeChanged = req.params.id;
-      const newData = req.body;
-
-      let reviewToBeChanged = await Review.findByIdAndUpdate(
-        idToBeChanged,
-        newData,
-        { new: true }
-      );
-
-      if (reviewToBeChanged) {
-        res
-          .status(200)
-          .json({ msg: `Review changed. The id is: ${reviewToBeChanged}` });
-      } else {
-        res
-          .status(404)
-          .json({ msg: `Review with id ${reviewToBeChanged} is not found.` });
-      }
-    } catch (error) {
-      next(error);
-    }
-  },
 };
 
 module.exports = reviewController;

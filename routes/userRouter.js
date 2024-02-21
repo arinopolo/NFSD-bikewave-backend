@@ -3,12 +3,25 @@ const userController = require("../controllers/userController");
 const router = express.Router();
 
 //Routes
+router.get(
+  "/favorites",
+  userController.verifyToken,
+  userController.getFavorites
+);
+router.put(
+  "/favorites/:id",
+  userController.verifyToken,
+  userController.addAndDeleteFavorites
+);
 
-router.get("/", userController.getUsers);
-router.get("/:id", userController.getOneUser);
+router.get(
+  "/mybicycles",
+  userController.verifyToken,
+  userController.getMyBicycles
+);
+router.get("/:id", userController.verifyToken, userController.getOneUser);
 router.post("/", userController.addUser);
-router.post("/login", userController.checkUser);
-router.post("/refreshtoken", userController.refreshToken);
+router.post("/login", userController.loginUser);
 router.delete("/:id", userController.deleteUser);
 router.patch("/:id", userController.changeUser);
 

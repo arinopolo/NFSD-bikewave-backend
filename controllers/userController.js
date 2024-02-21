@@ -1,26 +1,19 @@
 const User = require("../models/userModel");
+const Bicycle = require("../models/bicycleModel");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const mySecret = "cooper";
+
+const mySecret = process.env.SECRET;
 
 const userController = {
   //obtener la informacion de todos los usuarios
-  getUsers: async (req, res, next) => {
-    try {
-      const userList = await User.find();
-      res.json(userList);
-    } catch (error) {
-      next(error);
-    }
-  },
+
   getOneUser: async (req, res, next) => {
     try {
-      const userToBeConsulted = req.params.id;
-      const indexOfUserToBeConsulted = await User.findById(userToBeConsulted);
-
+      const indexOfUserToBeConsulted = await User.findById(req.userId);
       // cuando pongo un id aleatorio para que me ejecute el else no me lo ejecuto, me de el error de BSON...
       if (indexOfUserToBeConsulted) {
-        res.status(200).json(await User.find(indexOfUserToBeConsulted));
+        res.status(200).json(indexOfUserToBeConsulted);
       } else {
         res
           .status(404)
@@ -44,75 +37,149 @@ const userController = {
         salt: userSalt,
       });
       await userToAdd.save();
-      console.log(userToAdd);
-      res
-        .status(200)
-        .json({ msg: `User registered. The id is: ${userToAdd._id}` });
+
+      res.status(200).json({
+        msg: `User registered. The id is: ${userToAdd._id}`,
+        success: true,
+      });
     } catch (error) {
       next(error);
     }
   },
 
-  checkUser: async (req, res, next) => {
+  loginUser: async (req, res, next) => {
     const { email, password } = req.body;
 
-    // comprobando si el email esta registrado
+    // chequeando si el email esta registrado
     const [foundUser] = await User.find({ email });
     if (!foundUser) {
-      return res
-        .status(404)
-        .json({ msg: `User with email ${req.body.email} is not found.` });
+      return res.status(301).json({ msg: `Incorrect login.` });
     }
 
     // comprobando si la contraseña es correcta
     if (await bcrypt.compare(password, foundUser.password)) {
-      // el usuario ha entrado en la app y esta activo
-      foundUser.isActive = true;
-      await foundUser.save();
-      console.log(foundUser);
       //genero un token o jwt
-      const token = jwt.sign({ email: foundUser.email }, mySecret, {
-        expiresIn: "1d",
+      const token = jwt.sign(
+        { email: foundUser.email, id: foundUser._id },
+        mySecret,
+
+        {
+          expiresIn: "30d",
+        }
+      );
+      return res.status(200).json({
+        msg: `User logged in.`,
+        token,
+        success: true,
+        userId: foundUser._id,
+        userName: foundUser.firstName,
       });
-      return res.status(200).json({ msg: `User logged in.`, token });
     }
 
-    res.status(404).json({ msg: `Incorrert password.` });
+    res.status(403).json({ msg: `Incorrect credentials.`, success: false });
   },
 
   verifyToken: async (req, res, next) => {
     try {
       const token = req.headers.authorization;
       if (!token) {
-        res.status(404).json({ msg: `Missing token.` });
+        res.status(403).json({ msg: `Missing token.`, success: false });
       }
-      if (jwt.verify(token, mySecret)) {
+      jwt.verify(token, mySecret, (error, decoded) => {
+        if (error) {
+          return res
+            .status(403)
+            .json({ msg: ` Invalid token.`, success: false });
+        }
+
+        req.userId = decoded.id;
+
         return next();
-      } 
-    } catch (error) {
-      next(error);
-    }
-  },
-
-  refreshToken: async (req, res, next) => {
-    try {
-      const { email } = req.body;
-      const foundUser = await User.findOne({ email });
-
-      if (!foundUser || !foundUser.isActive) {
-        return res.status(404).json({ msg: "User not authorized." });
-      }
-
-      // genera un nuevo token si el usuario esta activo
-      const token = jwt.sign({ email: foundUser.email }, mySecret, {
-        expiresIn: "1d",
       });
-
-      res.status(200).json({ msg: "Token refreshed.", token });
     } catch (error) {
       next(error);
     }
   },
+
+  getMyBicycles: async (req, res, next) => {
+    try {
+      const user = await User.findById(req.userId).populate("bicycles");
+      res.status(200).json(user.bicycles);
+    } catch (error) {
+      console.log(error);
+      next(error);
+    }
+  },
+
+  getFavorites: async (req, res, next) => {
+    try {
+      const user = await User.findById(req.userId).populate("favorites");
+      res.status(200).json(user.favorites);
+    } catch (error) {
+      console.log(error);
+      next(error);
+    }
+  },
+
+  addAndDeleteFavorites: async (req, res, next) => {
+    try {
+      const bicycleId = req.params.id;
+      const user = await User.findById(req.userId);
+
+      const favorites = user.favorites;
+      const index = favorites.indexOf(bicycleId);
+      if (index !== -1) {
+        favorites.splice(index, 1);
+        await user.save();
+
+        await Bicycle.findByIdAndUpdate(bicycleId, { isFav: false });
+
+        res.status(200).json({
+          message: "Bicycle removed from the favorites list.",
+          isFav: false,
+        });
+      } else {
+        // Agregar la bicicleta a la lista de favoritos del usuario
+        user.favorites.push(bicycleId);
+        await user.save();
+
+        await Bicycle.findByIdAndUpdate(bicycleId, { isFav: true });
+
+        res.status(200).json({
+          message: "Bicycle added to the favorites list.",
+          isFav: true,
+        });
+      }
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  deleteFromFavorites: async (req, res, next) => {
+    try {
+      const bicycleId = req.params.id;
+      const user = await User.findById(req.userId);
+
+      if (user.favorites.includes(bicycleId)) {
+        const index = user.favorites.findIndex(
+          (item) => item._id === bicycleId
+        );
+        user.favorites.splice(index, 1);
+        await user.save();
+
+        res.status(200).json({
+          message: "Bicycle deleted from the favorites list.",
+        });
+      } else {
+        return res.status(400).json({
+          message: "Bicycle is not in the favorites list.",
+        });
+      }
+    } catch (error) {
+      next(error);
+    }
+  },
+
   deleteUser: async (req, res, next) => {
     try {
       const userToBeDeleted = req.params.id;
