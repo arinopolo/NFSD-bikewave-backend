@@ -39,13 +39,12 @@ const bicycleController = {
   getOneBicycle: async (req, res, next) => {
     try {
       const bicycleToBeConsulted = req.params.id;
-      const indexOfBicycleToBeConsulted = await Bicycle.findById(
+      const bicycleFound = await Bicycle.findById(
         bicycleToBeConsulted
-      );
+      ).populate("owner");
 
-      if (indexOfBicycleToBeConsulted) {
-        res.json(await Bicycle.findOne(indexOfBicycleToBeConsulted));
-        console.log(indexOfBicycleToBeConsulted);
+      if (bicycleFound) {
+        res.json(bicycleFound);
       } else {
         res.status(404).json({
           msg: `Bicycle with id ${bicycleToBeConsulted} is not found.`,
@@ -79,7 +78,7 @@ const bicycleController = {
 
       // se guarda la bicicleta en el modelo de usuario como su rental
       const user = await User.findById(req.userId);
-      user.rentals.push(bicycleToAdd);
+      user.bicycles.push(bicycleToAdd);
       await user.save();
 
       res.status(200).json({

@@ -67,15 +67,13 @@ const userController = {
           expiresIn: "30d",
         }
       );
-      return res
-        .status(200)
-        .json({
-          msg: `User logged in.`,
-          token,
-          success: true,
-          userId: foundUser._id,
-          userName: foundUser.firstName,
-        });
+      return res.status(200).json({
+        msg: `User logged in.`,
+        token,
+        success: true,
+        userId: foundUser._id,
+        userName: foundUser.firstName,
+      });
     }
 
     res.status(403).json({ msg: `Incorrect credentials.`, success: false });
@@ -102,34 +100,56 @@ const userController = {
       next(error);
     }
   },
-  getFavorites: async (req, res, next) => {
+
+  getMyBicycles: async (req, res, next) => {
     try {
-      const user = await User.findById(req.userId).populate("favorites");
-      res.json(user.favorites);
+      const user = await User.findById(req.userId).populate("bicycles");
+      res.status(200).json(user.bicycles);
     } catch (error) {
       console.log(error);
       next(error);
     }
   },
 
-  addToFavorites: async (req, res, next) => {
+  getFavorites: async (req, res, next) => {
+    try {
+      const user = await User.findById(req.userId).populate("favorites");
+      res.status(200).json(user.favorites);
+    } catch (error) {
+      console.log(error);
+      next(error);
+    }
+  },
+
+  addAndDeleteFavorites: async (req, res, next) => {
     try {
       const bicycleId = req.params.id;
       const user = await User.findById(req.userId);
 
-      if (user.favorites.includes(bicycleId)) {
-        return res.status(400).json({
-          message: "Bicycle is already in the favorites list.",
+      const favorites = user.favorites;
+      const index = favorites.indexOf(bicycleId);
+      if (index !== -1) {
+        favorites.splice(index, 1);
+        await user.save();
+
+        await Bicycle.findByIdAndUpdate(bicycleId, { isFav: false });
+
+        res.status(200).json({
+          message: "Bicycle removed from the favorites list.",
+          isFav: false,
+        });
+      } else {
+        // Agregar la bicicleta a la lista de favoritos del usuario
+        user.favorites.push(bicycleId);
+        await user.save();
+
+        await Bicycle.findByIdAndUpdate(bicycleId, { isFav: true });
+
+        res.status(200).json({
+          message: "Bicycle added to the favorites list.",
+          isFav: true,
         });
       }
-
-      // Agregar la bicicleta a la lista de favoritos del usuario
-      user.favorites.push(bicycleId);
-      await user.save();
-
-      res.status(200).json({
-        message: "Bicycle added to the favorites list.",
-      });
     } catch (error) {
       next(error);
     }

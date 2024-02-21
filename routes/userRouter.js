@@ -8,16 +8,16 @@ router.get(
   userController.verifyToken,
   userController.getFavorites
 );
-router.post(
+router.put(
   "/favorites/:id",
   userController.verifyToken,
-  userController.addToFavorites
+  userController.addAndDeleteFavorites
 );
 
-router.delete(
-  "/favorites/:id",
+router.get(
+  "/mybicycles",
   userController.verifyToken,
-  userController.deleteFromFavorites
+  userController.getMyBicycles
 );
 router.get("/:id", userController.verifyToken, userController.getOneUser);
 router.post("/", userController.addUser);
