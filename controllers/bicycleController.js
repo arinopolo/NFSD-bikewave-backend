@@ -12,6 +12,7 @@ const bicycleController = {
   //obtener la informacion de todas las bicicletas
   getBicycles: async (req, res, next) => {
     try {
+      console.log("get bicycles");
       let filter = {};
 
       if (req.query.category) {
