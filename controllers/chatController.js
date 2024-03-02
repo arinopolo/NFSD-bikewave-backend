@@ -4,11 +4,10 @@ const chatController = {
   //obtener la informacion de todas los chat de un usuario
   getChats: async (req, res, next) => {
     try {
-      const userId = req.params.id;
       const chatList = await Chat.find({
-        $or: [{ participantOne: userId }, { participantTwo: userId }],
+        members: { $in: [req.userId] },
       });
-      res.json(chatList);
+      res.status(200).json(chatList);
     } catch (error) {
       next(error);
     }
@@ -16,24 +15,37 @@ const chatController = {
   //obtener la informacion de una bicicleta
   getOneChat: async (req, res, next) => {
     try {
-      const chatToBeConsulted = req.params.id;
-      const indexOfChatToBeConsulted = await Chat.findById(chatToBeConsulted);
+      const chat = await Chat.findOne({
+        members: { $all: [req.userId, req.params.secondId] },
+      });
 
-      // cuando pongo un id aleatorio para que me ejecute el else no me lo ejecuto, me de el error de BSON...
-      if (indexOfChatToBeConsulted) {
-        res.json(await Chat.find(indexOfChatToBeConsulted));
-      } else {
-        res.status(404).json({
-          msg: `Chat with id ${chatToBeConsulted} is not found.`,
-        });
-      }
+      res.status(200).json(chat);
     } catch (error) {
       next(error);
     }
   },
   // agregar chat
   addChat: async (req, res, next) => {
+    const userId = req.userId;
+    const receiverId = req.body.receiverId;
+
+    const existingChat = await Chat.findOne({
+      members: {
+        $all: [userId, receiverId],
+      },
+    });
+
+    // si ya existe un chat enviamos un mensaje de error
+    if (existingChat) {
+      return res.status(400).json({ message: "El chat ya existe" });
+    }
+
+    const newChat = new Chat({
+      members: [userId, receiverId],
+    });
     try {
+      const result = await newChat.save();
+      res.status(200).json(result);
     } catch (error) {
       next(error);
     }

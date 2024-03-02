@@ -16,7 +16,11 @@ router.post(
   userController.verifyToken,
   bicycleController.addBicycle
 );
-router.delete("/:id", bicycleController.deleteBicycle);
+router.delete(
+  "/:id",
+  userController.verifyToken,
+  bicycleController.deleteBicycle
+);
 router.patch("/:id", bicycleController.changeBicycle);
 
 module.exports = router;
