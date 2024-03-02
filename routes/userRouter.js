@@ -8,7 +8,7 @@ router.get(
   userController.verifyToken,
   userController.getFavorites
 );
-router.put(
+router.patch(
   "/favorites/:id",
   userController.verifyToken,
   userController.addAndDeleteFavorites
@@ -19,10 +19,17 @@ router.get(
   userController.verifyToken,
   userController.getMyBicycles
 );
-router.get("/:id", userController.verifyToken, userController.getOneUser);
+router.get("/:id", userController.getOneUser);
 router.post("/", userController.addUser);
 router.post("/login", userController.loginUser);
+router.post("/send-email", userController.sendWelcomeEmail);
 router.delete("/:id", userController.deleteUser);
 router.patch("/:id", userController.changeUser);
+router.put(
+  "/forgot-password",
+
+  userController.forgotPassword
+);
+router.put("/reset-password/:token", userController.resetPassword);
 
 module.exports = router;

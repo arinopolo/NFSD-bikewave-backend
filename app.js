@@ -15,6 +15,7 @@ const bicycleRouter = require("./routes/bicycleRouter");
 const transactionRouter = require("./routes/transactionRouter");
 const reviewRouter = require("./routes/reviewRouter");
 const messageRouter = require("./routes/messageRouter");
+const chatRouter = require("./routes/chatRouter");
 
 const connectionToDataBase = process.env.DB_CREDENTIALS;
 mongoose
@@ -28,7 +29,9 @@ app.use("/bicycles", bicycleRouter);
 app.use("/transactions", transactionRouter);
 app.use("/reviews", reviewRouter);
 app.use("/messages", messageRouter);
+app.use("/chat", chatRouter);
 
 app.use(errorHandler);
+
 
 module.exports = app;

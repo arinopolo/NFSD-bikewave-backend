@@ -1,12 +1,15 @@
 const express = require("express");
 const messageController = require("../controllers/messageController");
 const router = express.Router();
+const userController = require("../controllers/userController");
 
 //Routes
 
-router.get("/", messageController.getMessages);
-router.get("/:id", messageController.getOneMessage);
-router.post("/", messageController.addMessage);
-router.delete("/:id", messageController.deleteMessage);
+router.get(
+  "/:chatId",
+  userController.verifyToken,
+  messageController.getMessages
+);
+router.post("/", userController.verifyToken, messageController.addMessage);
 
 module.exports = router;

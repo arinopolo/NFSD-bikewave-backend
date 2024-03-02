@@ -3,14 +3,7 @@ const Schema = mongoose.Schema;
 
 const chatSchema = new Schema(
   {
-    participantOne: { type: Schema.Types.ObjectId, ref: "User" },
-    participantTwo: { type: Schema.Types.ObjectId, ref: "User" },
-    messages: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "Message",
-      },
-    ],
+    members: [{ type: Schema.Types.ObjectId, ref: "User" }],
   },
   {
     timestamps: true,

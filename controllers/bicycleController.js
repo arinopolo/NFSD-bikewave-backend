@@ -117,10 +117,19 @@ const bicycleController = {
       const indexToBeDeleted = await Bicycle.findById(bicycleToBeDeleted);
 
       if (indexToBeDeleted) {
-        await Bicycle.deleteOne({ _id: indexToBeDeleted });
-        res
-          .status(200)
-          .json({ msg: `Bicycle deleted. The id is: ${bicycleToBeDeleted}` });
+        console.log("onwer del bik ", indexToBeDeleted.owner);
+        console.log("mi user id del token", req.userId);
+        if (indexToBeDeleted.owner.toString() === req.userId) {
+          await Bicycle.deleteOne({ _id: indexToBeDeleted });
+          res
+            .status(200)
+            .json({ msg: `Bicycle deleted. The id is: ${bicycleToBeDeleted}` });
+        } else {
+          // Usuario no autorizado para eliminar la bicicleta
+          res
+            .status(403)
+            .json({ msg: "You are not authorized to delete this bicycle." });
+        }
       } else {
         res
           .status(404)

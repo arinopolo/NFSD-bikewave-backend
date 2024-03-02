@@ -2,6 +2,12 @@ const User = require("../models/userModel");
 const Bicycle = require("../models/bicycleModel");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
+
+/*const Resend = require("resend").Resend;
+const resend = new Resend("re_5r5b546n_8vwXtD59Fy4sW1kBNcipTb8F"); */
+
+const nodemailer = require("nodemailer");
 
 const mySecret = process.env.SECRET;
 
@@ -10,7 +16,7 @@ const userController = {
 
   getOneUser: async (req, res, next) => {
     try {
-      const indexOfUserToBeConsulted = await User.findById(req.userId);
+      const indexOfUserToBeConsulted = await User.findById(req.params.id);
       // cuando pongo un id aleatorio para que me ejecute el else no me lo ejecuto, me de el error de BSON...
       if (indexOfUserToBeConsulted) {
         res.status(200).json(indexOfUserToBeConsulted);
@@ -39,11 +45,42 @@ const userController = {
       await userToAdd.save();
 
       res.status(200).json({
-        msg: `User registered. The id is: ${userToAdd._id}`,
+        msg: `User registered.`,
         success: true,
+        userToAdd,
       });
     } catch (error) {
       next(error);
+    }
+  },
+
+  sendWelcomeEmail: async (req, res) => {
+    const user = req.body;
+
+    const transporter = nodemailer.createTransport({
+      host: "smtp.gmail.com",
+      port: 465,
+      secure: true,
+      auth: {
+        user: "sedova4029@gmail.com",
+        pass: "ilki pcdv qenn pluw",
+      },
+    });
+
+    try {
+      const { info } = await transporter.sendMail({
+        from: '"Bikewave" <sedova4029@gmail.com>', // sender address
+        to: user.email, // list of receivers
+        subject: "Hola desde bikewave", // Subject line
+        html: `<h1>Bienvenid@ a bikewave, ${user.firstName}! </h1>`, // html body
+      });
+
+      res.status(200).json({ info });
+    } catch (error) {
+      console.error("Error al enviar el correo electrónico:", error);
+      res.status(500).json({
+        error: "Hubo un error al enviar el correo electrónico.",
+      });
     }
   },
 
@@ -131,23 +168,18 @@ const userController = {
       if (index !== -1) {
         favorites.splice(index, 1);
         await user.save();
-
-        await Bicycle.findByIdAndUpdate(bicycleId, { isFav: false });
-
         res.status(200).json({
           message: "Bicycle removed from the favorites list.",
-          isFav: false,
+          favorites,
         });
       } else {
         // Agregar la bicicleta a la lista de favoritos del usuario
         user.favorites.push(bicycleId);
         await user.save();
 
-        await Bicycle.findByIdAndUpdate(bicycleId, { isFav: true });
-
         res.status(200).json({
           message: "Bicycle added to the favorites list.",
-          isFav: true,
+          favorites,
         });
       }
     } catch (error) {
@@ -220,6 +252,96 @@ const userController = {
           .status(404)
           .json({ msg: `User with id ${idToBeChanged} is not found.` });
       }
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  forgotPassword: async (req, res, next) => {
+    const userEmail = req.body.email;
+
+    try {
+      const userToBeConsulted = await User.findOne({ email: userEmail });
+
+      if (!userToBeConsulted) {
+        return res.status(404).json({ msg: `User not found.` });
+      }
+
+      const transporter = nodemailer.createTransport({
+        host: "smtp.gmail.com",
+        port: 465,
+        secure: true,
+        auth: {
+          user: "sedova4029@gmail.com",
+          pass: "ilki pcdv qenn pluw",
+        },
+      });
+
+      const token = jwt.sign(
+        { email: userToBeConsulted.email, id: userToBeConsulted._id },
+        mySecret,
+
+        {
+          expiresIn: "10m",
+        }
+      );
+
+      const { info } = await transporter.sendMail({
+        from: '"Bikewave" <sedova4029@gmail.com>', // sender address
+        to: userEmail, // list of receivers
+        subject: "Hola desde bikewave", // Subject line
+        html: `<p>Haz clic en el siguiente enlace para restablecer tu contraseña: 
+            <a href="http://localhost:5173/reset-password/${token}">Restablecer Contraseña</a></p>`, // html body
+      });
+
+      res.status(200).json({ info, msg: "email sent succesfully" });
+    } catch (error) {
+      console.error("Error al consultar la base de datos:", error);
+      next(error);
+    }
+  },
+  resetPassword: async (req, res, next) => {
+    try {
+      const token = req.params.token;
+      console.log("Reached decoding, token:", token);
+
+      jwt.verify(token, mySecret, async (error, decoded) => {
+        if (error) {
+          return res
+            .status(403)
+            .json({ msg: `Invalid token.`, success: false });
+        }
+
+        const userId = decoded.id;
+
+        console.log("Decoded user ID:", userId);
+        const userSalt = Math.random().toFixed(7);
+        const encryptedPassword = await bcrypt.hash(
+          req.body.password,
+          Number(userSalt)
+        );
+
+        try {
+          const userToBeChanged = await User.findByIdAndUpdate(
+            userId,
+            { password: encryptedPassword },
+            { new: true }
+          );
+
+          console.log("Updated user:", userToBeChanged);
+          if (userToBeChanged) {
+            res
+              .status(200)
+              .json({ msg: `User changed. The id is: ${userToBeChanged._id}` });
+          } else {
+            res
+              .status(404)
+              .json({ msg: `User with id ${userId} is not found.` });
+          }
+        } catch (error) {
+          next(error);
+        }
+      });
     } catch (error) {
       next(error);
     }
