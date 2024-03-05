@@ -1,5 +1,7 @@
 const User = require("../models/userModel");
 const Bicycle = require("../models/bicycleModel");
+const Chat = require("../models/chatModel");
+const chatController = require("../controllers/chatController");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
@@ -141,6 +143,7 @@ const userController = {
   getMyBicycles: async (req, res, next) => {
     try {
       const user = await User.findById(req.userId).populate("bicycles");
+      console.log(user);
       res.status(200).json(user.bicycles);
     } catch (error) {
       console.log(error);
@@ -289,61 +292,120 @@ const userController = {
       const { info } = await transporter.sendMail({
         from: '"Bikewave" <sedova4029@gmail.com>', // sender address
         to: userEmail, // list of receivers
-        subject: "Hola desde bikewave", // Subject line
+        subject: "Restablecer tu contraseña de bikewave", // Subject line
         html: `<p>Haz clic en el siguiente enlace para restablecer tu contraseña: 
             <a href="http://localhost:5173/reset-password/${token}">Restablecer Contraseña</a></p>`, // html body
       });
 
-      res.status(200).json({ info, msg: "email sent succesfully" });
+      res
+        .status(200)
+        .json({ info, msg: "email sent succesfully", success: true });
     } catch (error) {
       console.error("Error al consultar la base de datos:", error);
       next(error);
     }
   },
   resetPassword: async (req, res, next) => {
+    const token = req.params.token;
+    console.log("Token decodificado:", token);
+
     try {
-      const token = req.params.token;
-      console.log("Reached decoding, token:", token);
+      const decoded = jwt.verify(token, mySecret);
+      const userId = decoded.id;
 
-      jwt.verify(token, mySecret, async (error, decoded) => {
-        if (error) {
-          return res
-            .status(403)
-            .json({ msg: `Invalid token.`, success: false });
-        }
+      console.log("ID de usuario decodificado:", userId);
+      const userSalt = Math.random().toFixed(7);
+      const encryptedPassword = await bcrypt.hash(
+        req.body.password,
+        Number(userSalt)
+      );
 
-        const userId = decoded.id;
+      const userToBeChanged = await User.findByIdAndUpdate(
+        userId,
+        { password: encryptedPassword },
+        { new: true }
+      );
 
-        console.log("Decoded user ID:", userId);
-        const userSalt = Math.random().toFixed(7);
-        const encryptedPassword = await bcrypt.hash(
-          req.body.password,
-          Number(userSalt)
-        );
+      if (userToBeChanged) {
+        res.status(200).json({
+          msg: `La contraseña del usuario se ha cambiado. El ID es: ${userToBeChanged._id}`,
+          success: true,
+        });
+      } else {
+        res
+          .status(404)
+          .json({ msg: `No se encontró un usuario con el ID ${userId}.` });
+      }
+    } catch (error) {
+      console.error("Error al consultar la base de datos:", error);
+      next(error);
+    }
+  },
 
+  bookBicycle: async (req, res, next) => {
+    const userId = req.userId;
+    const bicycleId = req.params.bicycleId;
+    const ownerId = req.body.ownerId;
+
+    console.log(userId, bicycleId, ownerId);
+
+    const transporter = nodemailer.createTransport({
+      host: "smtp.gmail.com",
+      port: 465,
+      secure: true,
+      auth: {
+        user: "sedova4029@gmail.com",
+        pass: "ilki pcdv qenn pluw",
+      },
+    });
+
+    try {
+      const user = await User.findById(userId);
+      const bicycle = await Bicycle.findById(bicycleId);
+      const owner = await User.findById(ownerId);
+
+      if (!user || !bicycle || !owner) {
+        return res.status(404).json({ msg: `Not found.` });
+      }
+
+      user.rentals.push(bicycle._id);
+      await user.save();
+
+      const existingChat = await Chat.findOne({
+        members: {
+          $all: [userId, owner],
+        },
+      });
+
+      if (!existingChat) {
+        const newChat = new Chat({
+          members: [userId, owner],
+        });
         try {
-          const userToBeChanged = await User.findByIdAndUpdate(
-            userId,
-            { password: encryptedPassword },
-            { new: true }
-          );
-
-          console.log("Updated user:", userToBeChanged);
-          if (userToBeChanged) {
-            res
-              .status(200)
-              .json({ msg: `User changed. The id is: ${userToBeChanged._id}` });
-          } else {
-            res
-              .status(404)
-              .json({ msg: `User with id ${userId} is not found.` });
-          }
+          const result = await newChat.save();
         } catch (error) {
           next(error);
         }
+      }
+
+      const { info } = await transporter.sendMail({
+        from: '"Bikewave" <sedova4029@gmail.com>', // sender address
+        to: user.email, // list of receivers
+        subject: " Detalles de tu nueva reserva!", // Subject line
+        html: `<h1>Hola, ${user.firstName}! </h1>
+        <p>Gracias por tu reserva! Aqui tienes los detalles</p>
+        <p> La marca de la bicicleta que has reservado: ${bicycle.brand}</p>
+        <p>El modelo : ${bicycle.model}</p>
+        <p>Presiona en el siguiente enlace para abrir el chat con el propietario: </p>
+        <a href="http://localhost:5173/chats/">Contactar</a>`, // html body
       });
+
+      res.status(200).json({ info, success: true });
     } catch (error) {
-      next(error);
+      res.status(500).json({
+        error: "Hubo un error al enviar el correo electrónico.",
+        success: false,
+      });
     }
   },
 };
