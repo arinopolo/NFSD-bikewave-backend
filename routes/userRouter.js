@@ -1,5 +1,6 @@
 const express = require("express");
 const userController = require("../controllers/userController");
+const chatController = require("../controllers/chatController");
 const router = express.Router();
 
 //Routes
@@ -31,5 +32,10 @@ router.put(
   userController.forgotPassword
 );
 router.put("/reset-password/:token", userController.resetPassword);
+router.put(
+  "/book/:bicycleId",
+  userController.verifyToken,
+  userController.bookBicycle
+);
 
 module.exports = router;
