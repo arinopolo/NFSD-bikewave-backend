@@ -371,23 +371,6 @@ const userController = {
       user.rentals.push(bicycle._id);
       await user.save();
 
-      const existingChat = await Chat.findOne({
-        members: {
-          $all: [userId, owner],
-        },
-      });
-
-      if (!existingChat) {
-        const newChat = new Chat({
-          members: [userId, owner],
-        });
-        try {
-          const result = await newChat.save();
-        } catch (error) {
-          next(error);
-        }
-      }
-
       const { info } = await transporter.sendMail({
         from: '"Bikewave" <sedova4029@gmail.com>', // sender address
         to: user.email, // list of receivers
@@ -396,6 +379,7 @@ const userController = {
         <p>Gracias por tu reserva! Aqui tienes los detalles</p>
         <p> La marca de la bicicleta que has reservado: ${bicycle.brand}</p>
         <p>El modelo : ${bicycle.model}</p>
+        <p>El precio : ${bicycle.price} €/dia</p>
         <p>Presiona en el siguiente enlace para abrir el chat con el propietario: </p>
         <a href="http://localhost:5173/chats/">Contactar</a>`, // html body
       });
@@ -406,6 +390,46 @@ const userController = {
         error: "Hubo un error al enviar el correo electrónico.",
         success: false,
       });
+    }
+  },
+
+  changePassword: async (req, res, next) => {
+    try {
+      //desencriptar la contraseña
+
+      const oldPassword = req.body.oldPassword;
+      const userId = req.userId;
+      const newPassword = req.body.newPassword;
+
+      const userInfo = await User.findById(userId);
+
+      const isPasswordValid = await bcrypt.compare(
+        oldPassword,
+        userInfo.password
+      );
+
+      if (isPasswordValid) {
+        const newEncryptedPassword = await bcrypt.hash(
+          newPassword,
+          Number(userInfo.salt)
+        );
+
+        userInfo.password = newEncryptedPassword;
+        await userInfo.save();
+
+        res.status(200).json({
+          msg: `Password changed .`,
+          success: true,
+          userInfo,
+        });
+      } else {
+        res.status(400).json({
+          msg: `Passwords dont match.`,
+          success: false,
+        });
+      }
+    } catch (error) {
+      next(error);
     }
   },
 };

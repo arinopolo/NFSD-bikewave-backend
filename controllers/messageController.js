@@ -6,8 +6,14 @@ const messageController = {
   //obtener la informacion de todos los mensajes
   getMessages: async (req, res, next) => {
     const { chatId } = req.params;
+    const userId = req.userId;
     try {
       const messageList = await Message.find({ chatId });
+
+      const unreadMessagesCount = messageList.filter(
+        (message) => !message.seen && message.author.toString() !== userId
+      ).length;
+
       res.status(200).json(messageList);
     } catch (error) {
       next(error);
