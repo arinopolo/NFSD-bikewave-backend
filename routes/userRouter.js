@@ -37,5 +37,10 @@ router.put(
   userController.verifyToken,
   userController.bookBicycle
 );
+router.put(
+  "/change-password",
+  userController.verifyToken,
+  userController.changePassword
+);
 
 module.exports = router;

@@ -6,6 +6,7 @@ const messageSchema = new Schema(
     chatId: { type: Schema.Types.ObjectId, ref: "Chat" },
     author: { type: Schema.Types.ObjectId, ref: "User" },
     text: { type: String, required: true },
+    seen: { type: Boolean, default: false },
   },
   {
     timestamps: true,

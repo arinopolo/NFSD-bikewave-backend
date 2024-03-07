@@ -37,7 +37,9 @@ const chatController = {
 
     // si ya existe un chat enviamos un mensaje de error
     if (existingChat) {
-      return res.status(400).json({ message: "El chat ya existe" });
+      return res
+        .status(200)
+        .json({ message: "El chat ya existe", chat: existingChat });
     }
 
     const newChat = new Chat({
@@ -46,7 +48,7 @@ const chatController = {
     try {
       const result = await newChat.save();
       console.log(result);
-      res.status(200).json(result);
+      res.status(200).json({ result, success: true });
     } catch (error) {
       next(error);
     }

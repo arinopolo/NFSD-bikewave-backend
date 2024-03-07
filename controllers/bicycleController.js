@@ -3,10 +3,11 @@ const User = require("../models/userModel");
 const { v2: cloudinary } = require("cloudinary");
 
 cloudinary.config({
-  cloud_name: "du6tcqzpu",
-  api_key: "438824242274272",
-  api_secret: "aMIB0AIfwoBe1dcP23w_eZxkI5Y",
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.API_KEY,
+  api_secret: process.env.API_SECRET,
 });
+
 
 const bicycleController = {
   //obtener la informacion de todas las bicicletas

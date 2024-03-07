@@ -10,6 +10,7 @@ router.get(
   userController.verifyToken,
   messageController.getMessages
 );
+
 router.post("/", userController.verifyToken, messageController.addMessage);
 
 module.exports = router;
