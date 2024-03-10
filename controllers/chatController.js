@@ -1,4 +1,7 @@
 const Chat = require("../models/chatModel");
+const Message = require("../models/messageModel");
+const messageController = require("../controllers/messageController");
+const { default: mongoose, mongo } = require("mongoose");
 
 const chatController = {
   //obtener la informacion de todas los chat de un usuario
@@ -6,12 +9,34 @@ const chatController = {
     try {
       const chatList = await Chat.find({
         members: { $in: [req.userId] },
-      });
+      }).lean();
+
+      //-----
+
+      for (let i = 0; i < chatList.length; i++) {
+        const messageList = await Message.find({ chatId: chatList[i]._id });
+
+        let unreadMessagesCount = 0;
+
+        unreadMessagesCount = messageList.filter(
+          (message) => !message.seen && message.author.toString() !== req.userId
+        ).length;
+
+        chatList[i].unreadMessagesCount = unreadMessagesCount;
+        /* console.log(
+          `"mensajes no leidos de este chat ${chatList[i]._id}`,
+          chatList[i].unreadMessagesCount
+        ); */
+      }
+
+      //-----
+
       res.status(200).json(chatList);
     } catch (error) {
       next(error);
     }
   },
+
   //obtener la informacion de una bicicleta
   getOneChat: async (req, res, next) => {
     try {
@@ -38,7 +63,7 @@ const chatController = {
     // si ya existe un chat enviamos un mensaje de error
     if (existingChat) {
       return res
-        .status(200)
+        .status(400)
         .json({ message: "El chat ya existe", chat: existingChat });
     }
 
@@ -69,6 +94,28 @@ const chatController = {
           .status(404)
           .json({ msg: `Chat with id ${chatToBeDeleted} is not found.` });
       }
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  seenMessage: async (req, res, next) => {
+    try {
+      const chatId = req.params.id;
+      console.log(req.userId);
+      console.log(chatId);
+
+      const messagesToBeUpdated = await Message.updateMany(
+        {
+          chatId: new mongo.ObjectId(chatId),
+          seen: false,
+          author: { $ne: new mongo.ObjectId(req.userId) },
+        },
+        { $set: { seen: true } }
+      );
+
+      console.log(messagesToBeUpdated);
+      res.status(200).json({});
     } catch (error) {
       next(error);
     }

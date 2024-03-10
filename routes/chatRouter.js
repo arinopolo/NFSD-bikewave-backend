@@ -15,4 +15,10 @@ router.get(
 router.post("/", userController.verifyToken, chatController.addChat);
 router.delete("/:id", userController.verifyToken, chatController.deleteChat);
 
+router.patch(
+  "/:id/seen",
+  userController.verifyToken,
+  chatController.seenMessage
+);
+
 module.exports = router;

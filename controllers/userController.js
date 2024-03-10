@@ -1,7 +1,6 @@
 const User = require("../models/userModel");
 const Bicycle = require("../models/bicycleModel");
 const Chat = require("../models/chatModel");
-const chatController = require("../controllers/chatController");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
@@ -74,7 +73,13 @@ const userController = {
         from: '"Bikewave" <sedova4029@gmail.com>', // sender address
         to: user.email, // list of receivers
         subject: "Hola desde bikewave", // Subject line
-        html: `<h1>Bienvenid@ a bikewave, ${user.firstName}! </h1>`, // html body
+        html: `<h1>Bienvenid@ a bikewave, ${user.firstName}! </h1> <p>¡Qué emocionante tenerte con nosotros en la comunidad ciclista! 😊 </p>
+        <p>Prepárate para vivir aventuras sobre dos ruedas y descubrir nuevas rutas junto a otros apasionados del ciclismo como tú.</p>
+<p>En nuestra app, encontrarás bicis listas para rodar y una comunidad lista para explorar. Si tienes alguna duda o solo quieres charlar sobre ciclismo, ¡aquí estamos para ayudarte!
+        </p>
+       <p>¡Nos vemos pedaleando pronto!</p> 
+        
+       <p> El equipo de Bikewave.</p>`, // html body
       });
 
       res.status(200).json({ info });
@@ -376,7 +381,7 @@ const userController = {
         to: user.email, // list of receivers
         subject: " Detalles de tu nueva reserva!", // Subject line
         html: `<h1>Hola, ${user.firstName}! </h1>
-        <p>Gracias por tu reserva! Aqui tienes los detalles</p>
+        <p>¡Gracias por tu reserva! Aquí tienes los detalles</p>
         <p> La marca de la bicicleta que has reservado: ${bicycle.brand}</p>
         <p>El modelo : ${bicycle.model}</p>
         <p>El precio : ${bicycle.price} €/dia</p>
