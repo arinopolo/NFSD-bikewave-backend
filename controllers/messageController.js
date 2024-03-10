@@ -51,6 +51,7 @@ const messageController = {
       next(error);
     }
   },
+
 };
 
 module.exports = messageController;
