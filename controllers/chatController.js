@@ -102,8 +102,6 @@ const chatController = {
   seenMessage: async (req, res, next) => {
     try {
       const chatId = req.params.id;
-      console.log(req.userId);
-      console.log(chatId);
 
       const messagesToBeUpdated = await Message.updateMany(
         {
