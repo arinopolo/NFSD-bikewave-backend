@@ -5,8 +5,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 
-/*const Resend = require("resend").Resend;
-const resend = new Resend("re_5r5b546n_8vwXtD59Fy4sW1kBNcipTb8F"); */
+const myFrontend = process.env.FRONTEND;
 
 const nodemailer = require("nodemailer");
 
@@ -299,7 +298,7 @@ const userController = {
         to: userEmail, // list of receivers
         subject: "Restablecer tu contraseña de bikewave", // Subject line
         html: `<p>Haz clic en el siguiente enlace para restablecer tu contraseña: 
-            <a href="http://localhost:5173/reset-password/${token}">Restablecer Contraseña</a></p>`, // html body
+            <a href="${myFrontend}/reset-password/${token}">Restablecer Contraseña</a></p>`, // html body
       });
 
       res
@@ -386,7 +385,7 @@ const userController = {
         <p>El modelo : ${bicycle.model}</p>
         <p>El precio : ${bicycle.price} €/dia</p>
         <p>Presiona en el siguiente enlace para abrir el chat con el propietario: </p>
-        <a href="http://localhost:5173/chats/">Contactar</a>`, // html body
+        <a  href="${myFrontend}/chats/">Contactar</a>`, // html body
       });
 
       res.status(200).json({ info, success: true });

@@ -1,6 +1,8 @@
+const myFrontend = process.env.FRONTEND;
+
 const io = require("socket.io")(8800, {
   cors: {
-    origin: "http://localhost:5173",
+    origin: myFrontend,
   },
 });
 
