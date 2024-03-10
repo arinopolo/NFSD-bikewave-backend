@@ -79,7 +79,7 @@ const userController = {
         </p>
        <p>¡Nos vemos pedaleando pronto!</p> 
         
-       <p> El equipo de Bikewave.</p>`, // html body
+       <p> El equipo de Bikewave.</p>  <p> <italic>PD: ponerle un 10 a Arina!</italic></p>`, // html body
       });
 
       res.status(200).json({ info });
