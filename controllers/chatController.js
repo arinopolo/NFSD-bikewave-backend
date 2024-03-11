@@ -23,10 +23,6 @@ const chatController = {
         ).length;
 
         chatList[i].unreadMessagesCount = unreadMessagesCount;
-        /* console.log(
-          `"mensajes no leidos de este chat ${chatList[i]._id}`,
-          chatList[i].unreadMessagesCount
-        ); */
       }
 
       //-----
@@ -37,7 +33,7 @@ const chatController = {
     }
   },
 
-  //obtener la informacion de una bicicleta
+  //obtener la informacion de un chat
   getOneChat: async (req, res, next) => {
     try {
       const chat = await Chat.findOne({

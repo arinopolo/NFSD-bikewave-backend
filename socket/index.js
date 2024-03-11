@@ -1,10 +1,4 @@
-const myFrontend = process.env.FRONTEND;
 
-const io = require("socket.io")(8800, {
-  cors: {
-    origin: myFrontend,
-  },
-});
 
 let activeUsers = [];
 
@@ -46,5 +40,6 @@ const sendMessage = (receiverId, message) => {
     io.to(user.socketId).emit("receive-message", message);
   }
 };
+
 
 module.exports = { sendMessage };
