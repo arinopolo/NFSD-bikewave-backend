@@ -1,6 +1,8 @@
 const Message = require("../models/messageModel");
 const Chat = require("../models/chatModel");
-const { sendMessage } = require("../socket");
+const { sendMessage } = require("../app");
+
+console.log("qie es sendMessage", sendMessage);
 
 const messageController = {
   //obtener la informacion de todos los mensajes
@@ -51,7 +53,6 @@ const messageController = {
       next(error);
     }
   },
-
 };
 
 module.exports = messageController;
