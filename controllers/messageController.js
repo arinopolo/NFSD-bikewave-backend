@@ -1,6 +1,6 @@
 const Message = require("../models/messageModel");
 const Chat = require("../models/chatModel");
-const { sendMessage } = require("../app");
+const { sendMessage } = require("..");
 
 console.log("qie es sendMessage", sendMessage);
 
