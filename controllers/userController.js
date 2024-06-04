@@ -6,6 +6,9 @@ const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 
 const myFrontend = process.env.FRONTEND;
+const bikawaveEmail = process.env.EMAIL;
+const nodemailEmail = process.env.NODEMAILEMAIL;
+const nodemailPas = process.env.NODEMAILPAS;
 
 const nodemailer = require("nodemailer");
 
@@ -62,14 +65,14 @@ const userController = {
       port: 465,
       secure: true,
       auth: {
-        user: "sedova4029@gmail.com",
-        pass: "ilki pcdv qenn pluw",
+        user: nodemailEmail,
+        pass: nodemailPas,
       },
     });
 
     try {
       const { info } = await transporter.sendMail({
-        from: '"Bikewave" <sedova4029@gmail.com>', // sender address
+        from: `"Bikewave" <${bikawaveEmail}>`,
         to: user.email, // list of receivers
         subject: "Hola desde bikewave", // Subject line
         html: `<h1>Bienvenid@ a bikewave, ${user.firstName}! </h1> <p>¡Qué emocionante tenerte con nosotros en la comunidad ciclista! 😊 </p>
@@ -78,7 +81,7 @@ const userController = {
         </p>
        <p>¡Nos vemos pedaleando pronto!</p> 
         
-       <p> El equipo de Bikewave.</p>  <p> <italic>PD: ponerle un 10 a Arina!</italic></p>`, // html body
+       <p> El equipo de Bikewave.</p>  <p> <i>PD: ponerle un 10 a Arina!</i></p>`, // html body
       });
 
       res.status(200).json({ info });
@@ -294,7 +297,7 @@ const userController = {
       );
 
       const { info } = await transporter.sendMail({
-        from: '"Bikewave" <sedova4029@gmail.com>', // sender address
+        from: '"Bikewave" <${bikawaveEmail}>', // sender address
         to: userEmail, // list of receivers
         subject: "Restablecer tu contraseña de bikewave", // Subject line
         html: `<p>Haz clic en el siguiente enlace para restablecer tu contraseña: 
