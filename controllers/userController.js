@@ -6,7 +6,6 @@ const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 
 const myFrontend = process.env.FRONTEND;
-const bikawaveEmail = process.env.EMAIL;
 const nodemailEmail = process.env.NODEMAILEMAIL;
 const nodemailPas = process.env.NODEMAILPAS;
 
@@ -72,7 +71,7 @@ const userController = {
 
     try {
       const { info } = await transporter.sendMail({
-        from: `"Bikewave" <${bikawaveEmail}>`,
+        from: `"Bikewave" <${nodemailEmail}>`,
         to: user.email, // list of receivers
         subject: "Hola desde bikewave", // Subject line
         html: `<h1>Bienvenid@ a bikewave, ${user.firstName}! </h1> <p>¡Qué emocionante tenerte con nosotros en la comunidad ciclista! 😊 </p>
